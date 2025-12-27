@@ -12,7 +12,12 @@ s_num = random.randint(LI, LS)
 c = 0
 
 while True:
-    u_num = int(input(f'Ingresa el número que crees que es (del {LI} al {LS}): '))
+    try:
+        u_num = int(input(f'Ingresa el número que crees que es (del {LI} al {LS}): '))
+    except ValueError:
+        print('Ingresa un valor válido: solo números enteros')
+        continue
+    
     c += 1
     if u_num < LI or u_num > LS:
         print(f'El número está entre el {LI} y el {LS}')
