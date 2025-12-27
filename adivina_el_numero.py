@@ -1,0 +1,22 @@
+'''La computadora elige un número aleatorio entre 1 y 100,
+y el usuario debe adivinarlo con pistas ("mayor" o "menor").
+Conceptos: random.randint(), bucles while, comparaciones.'''
+
+import random
+
+LI = 1
+LS = 100
+s_num = random.randint(LI, LS)
+
+while True:
+    u_num = int(input(f'Ingresa el número que crees que es (del {LI} al {LS}): '))
+    if u_num < LI or u_num > LS:
+        print(f'El número está entre el {LI} y el {LS}')
+    elif u_num < s_num:
+        print('El número es mayor')
+    elif u_num > s_num:
+        print('El número es menor')
+    elif u_num == s_num:
+        print(f'Felicidades, acertaste! el número es {s_num}')
+        break
+        
