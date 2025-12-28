@@ -3,6 +3,7 @@ y el usuario debe adivinarlo con pistas ("mayor" o "menor").
 - Cuenta los intentos en los que adivinaste
 - Solo permite números enteros y te dice si ingresaste algo no valido
 - Pregunta si quieres volver a jugar
+- Sistema de puntuación máxima
 '''
 
 import random
@@ -10,6 +11,8 @@ import random
 LI = 1
 LS = 100
 repetir = True
+c = 0
+mejor = float('inf')
 
 while repetir:
     s_num = random.randint(LI, LS)
@@ -34,14 +37,22 @@ while repetir:
         elif u_num > s_num:
             print('El número es menor')
         elif u_num == s_num:
-            print(f'Felicidades, acertaste! el número es {s_num}')
-            print(f'Te tomó {c} intentos')
+            print(f'\n--- Acertaste! el número es {s_num}')
+            
+            if c < mejor:
+                mejor = c
+                print(f'- Felicidades! tu nuevo record es de {mejor} intentos')
+            else:
+                print(f'-- Te tomó {c} intentos')
+                print(f'- Tu record actual es de: {mejor} intentos')
             break
     
     # lower() convierte a minusculas y strip() elimina espacios
-    res_repetir = input('¿Quieres volver a jugar? (s = sí) ').lower().strip()
+    res_repetir = input('\n¿Quieres volver a jugar? (s = sí) ').lower().strip()
     if res_repetir != 's':
-        print('\nGracias por jugar')
+        if mejor != float('inf'):
+            print(f'\nTu mejor récord fue de {mejor} intentos')
+        print('Gracias por jugar!')
         repetir = False
 
         
