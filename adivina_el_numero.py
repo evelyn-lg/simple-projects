@@ -13,96 +13,118 @@ import os
 
 NOMBRE_ARCHIVO = "record.txt"
 LIMITE_INTENTOS = 100
+NIVELES = {
+    1: {'nombre': 'Fácil', 'min': 1, 'max': 100},
+    2: {'nombre': 'Medio', 'min': 1, 'max': 500},
+    3: {'nombre': 'Difícil', 'min': 1, 'max': 1000}
+}
 
 def cargar_record():
     try:
         with open(NOMBRE_ARCHIVO, "r") as f:
-            # Leemos cada línea, quitamos espacios y convertimos a int
-            return [int(linea.strip()) for linea in f]
+            return [int(linea.strip()) for linea in f if linea.strip().isdigit()]
     except (FileNotFoundError, ValueError, IndexError):
-        # Si el archivo no existe, creamos una lista inicial
-        return [LIMITE_INTENTOS, LIMITE_INTENTOS, LIMITE_INTENTOS]
+        return [LIMITE_INTENTOS] * len(NIVELES)
 
-def guardar_record(nuevo_record):
+def guardar_record(records):
     with open(NOMBRE_ARCHIVO, "w") as f:
-        for n in nuevo_record:
+        for n in records:
             f.write(f'{n}\n')
+
+def mostrar_records(records):
+    print('\n' + "="*30)
+    print("MEJORES PUNTUACIONES")
+    print("="*30)
+    for i, record in enumerate(records, 1):
+        nombre = NIVELES[i]['nombre']
+        if record >= LIMITE_INTENTOS:
+            print(f"{i}. Nivel {nombre}: No jugado")
+        else:
+            print(f"{i}. Nivel {nombre}: {record} intentos")
+
+def main():
+    repetir = True
+    records = cargar_record()
+    
+    while repetir:
+        print("\n" + "="*30)
+        print("¡ADIVINA EL NÚMERO!")
+        print("="*30)
+        
+        # Selección de nivel
+        while True:
+            try:
+                print("\nSelecciona un nivel:")
+                for i, nivel in NIVELES.items():
+                    print(f" {i}. {nivel['nombre']} ({nivel['min']}-{nivel['max']})")
+                
+                nivel = int(input('\nOpción: '))
+                if nivel in NIVELES:
+                    break
+                print('Opción no válida. Elige 1, 2 o 3')
+            except ValueError:
+                print('Por favor, ingresa un número')
+                continue
+        
+        config = NIVELES[nivel]
+        numero_secreto = random.randint(config['min'], config['max'])
+        intentos = 0
+        
+        print(f'\n{"-"*30}')
+        print(f'Nivel: {config["nombre"]}')
+        #print(f'Para debug, el número es: {numero_secreto}')
+        print("-"*30)
+        
+        # Juego principal
+        while True:
+            try:
+                guess = int(input(f'\nIntento #{intentos+1}: Adivina el número ({config["min"]}-{config["max"]}): '))
+                intentos += 1
+                
+                if guess < config['min'] or guess > config['max']:
+                    print(f'El número debe estar entre {config["min"]} y {config["max"]}')
+                elif guess < numero_secreto:
+                    print('Demasiado bajo')
+                elif guess > numero_secreto:
+                    print('Demasiado alto')
+                else:
+                    print(f'\n{"¡FELICIDADES!":^30}')
+                    print(f'{"="*30}')
+                    print(f'Adivinaste en {intentos} intentos')
+                    print(f'Número secreto: {numero_secreto}')
+                    
+                    # Actualizar récord
+                    if intentos < records[nivel-1]:
+                        records[nivel-1] = intentos
+                        guardar_record(records)
+                        print(f'¡Nuevo récord en nivel {config["nombre"]}!')
+                    
+                    print(f'Récord actual: {records[nivel-1]} intentos')
+                    break
+                    
+            except ValueError:
+                print('Por favor, ingresa un número válido')
+                continue
+        
+        # ¿Jugar de nuevo?
+        while True:
+            opcion = input('\n¿Qué quieres hacer?\n1. Jugar otra vez\n2. Ver récords\n3. Reiniciar récords\n4. Salir\n\nOpción: ').strip()
             
-
-LI = 1
-LS = 100
-repetir = True
-c = 0
-nivel_actual = ['Fácil', 'Medio', 'Difícil'] 
-
-while repetir:
-    mejor = cargar_record()
-    c = 0
-    print("\n" + "="*20)
-    print("¡ADIVINA EL NÚMERO!")
-    print("="*20)
-    while True:
-        try:
-            s_nivel = int(input('\nElige el nivel en el que quieres jugar:\n 1. Fácil\n 2. Medio\n 3. Difícil\n'))
-            if s_nivel in [1, 2, 3]:
+            if opcion == '1':
+                break  # Salir solo del menú post-juego
+            elif opcion == '2':
+                mostrar_records(records)
+            elif opcion == '3':
+                records = [LIMITE_INTENTOS] * len(NIVELES)
+                guardar_record(records)
+                print('¡Todos los récords han sido reiniciados!')
+            elif opcion == '4':
+                mostrar_records(records)
+                print('\n¡Gracias por jugar!')
+                repetir = False
                 break
             else:
-                print('Ingresa un número del 1 al 3')       
-        except ValueError:
-            print('Ingresa un número del 1 al 3')
-            continue   
-    if s_nivel == 1:
-        LS = 100
-    elif s_nivel == 2:
-        LS = 500
-    elif s_nivel == 3:
-        LS = 1000
-        
-    s_num = random.randint(LI, LS)
-        
-    print('Para debug, el número es: ', s_num)
-    print(f'Nivel actual: {nivel_actual[s_nivel-1]}')
-    
-    while True:
-        try:
-            u_num = int(input(f'Ingresa el número que crees que es (del {LI} al {LS}): '))
-        except ValueError:
-            print('Ingresa un valor válido: solo números enteros')
-            continue
-        
-        c += 1
-        if u_num < LI or u_num > LS:
-            print(f'El número está entre el {LI} y el {LS}')
-        elif u_num < s_num:
-            print('El número es mayor')
-        elif u_num > s_num:
-            print('El número es menor')
-        elif u_num == s_num:
-            print(f'\n--- Acertaste! el número es {s_num}')
-                
-            if c < mejor[s_nivel - 1]:
-                    mejor[s_nivel - 1] = c
-                    guardar_record(mejor)
-                    print(f'- Felicidades! tu nuevo record en nivel {nivel_actual[s_nivel-1]} es de {mejor[s_nivel - 1]} intentos')
-            else:
-                print(f'-- Te tomó {c} intentos')
-                print(f'- Tu record actual es de: {mejor[s_nivel - 1]} intentos')
-                
-            break
-    
-    # lower() convierte a minusculas y strip() elimina espacios
-    res_repetir = input('\n¿Quieres volver a jugar? (s = sí) (r = reiniciar record) ').lower().strip()
-    if res_repetir == 's' or res_repetir == 'r':
-        if res_repetir == 'r':
-            mejor[s_nivel - 1] = 100
-            guardar_record(mejor)
-            print('Record reiniciado...')
-    else:
-        print('\n* Mejores puntuaciones: ')
-        for i, valor in enumerate(mejor):
-            if mejor[i] >= 100:
-                print(f'Nivel {nivel_actual[i]}: no jugado')
-            else: 
-                print(f'Nivel {nivel_actual[i]}: {mejor[i]} intentos')
-        print('\nGracias por jugar!')
-        repetir = False
+                print('Opción no válida. Elige del 1 al 4')
+
+if __name__ == "__main__":
+    main()
