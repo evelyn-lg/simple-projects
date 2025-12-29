@@ -1,36 +1,16 @@
+'''
+Docstring for gestor_de_contactos
+Guarda contactos (nombre, teléfono, email) en un archivo CSV
+Permite agregar, mostrar, buscar contactos.
+
+Conceptos: archivos CSV, diccionarios, listas.
+'''
+
 import csv
 import os
 
 NOMBRE_ARCHIVO = "contactos.csv"
 contactos = []
-
-def menu():
-    while True:
-        print('\n - Menú - ')
-        print('1. Agregar contacto')
-        print('2. Mostrar contactos')
-        print('3. Salir')
-        try:
-            opc = int(input())
-            if opc in range(1,5):
-                break
-            print('Elige una opción válida')
-        except ValueError:
-            print('Elige una opción válida')
-            continue            
-    return opc
-
-def guardar_contactos():
-    try:
-        with open(NOMBRE_ARCHIVO, mode='w', newline='', encoding='utf-8') as file:
-            if contactos:
-                encabezado = ['nombre', 'telefono', 'email']
-                writer = csv.DictWriter(file, fieldnames=encabezado)
-                writer.writeheader()
-                writer.writerows(contactos)
-        print(f'Contacto guardado exitosamente en {NOMBRE_ARCHIVO} - {len(contactos)} contactos')
-    except Exception as e:
-        print(f'Error al guardar contactos: {e}')
 
 def obtener_contactos():
     try:
@@ -46,6 +26,18 @@ def obtener_contactos():
     except Exception as e:
         print(f'Error al cargar contactos: {e}')
         c = []
+
+def guardar_contactos():
+    try:
+        with open(NOMBRE_ARCHIVO, mode='w', newline='', encoding='utf-8') as file:
+            if contactos:
+                encabezado = ['nombre', 'telefono', 'email']
+                writer = csv.DictWriter(file, fieldnames=encabezado)
+                writer.writeheader()
+                writer.writerows(contactos)
+        print(f'Contacto guardado exitosamente en {NOMBRE_ARCHIVO} - {len(contactos)} contactos')
+    except Exception as e:
+        print(f'Error al guardar contactos: {e}')
 
 def agregar_contacto():
     print("\n--- AGREGAR CONTACTO ---")
@@ -89,8 +81,45 @@ def mostrar_contactos(lista_contactos):
         print(f'{nombre:<20} {telefono:<15} {email:<25}')
     print('='*60)
     
+def buscar_contacto():
+    if not contactos:
+        print('La lista de contactos está vacia')
+        return
+    
+    abuscar = input('Ingresa el nombre, telefono o email a buscar: ').strip().lower()
+    if not abuscar:
+        print('Debe ingredar un término para buscar')
+        return
+    
+    resultados = []
+    for contacto in contactos:
+        if (abuscar in contacto['nombre'].lower() or
+            abuscar in contacto['telefono'].lower() or
+            abuscar in contacto['email'].lower()):
+            resultados.append(contacto)
+            
+    if resultados:
+        print(f'Se encontraron {len(resultados)} resultado(s): ')
+        mostrar_contactos(resultados)
+    else:
+        print(f'No se encontraron resultados coincidentes con {abuscar}')        
 
-
+def menu():
+    while True:
+        print('\n - Menú - ')
+        print('1. Agregar contacto')
+        print('2. Mostrar contactos')
+        print('3. Buscar contacto')
+        print('4. Salir')
+        try:
+            opc = int(input())
+            if opc in range(1,5):
+                break
+            print('Elige una opción válida')
+        except ValueError:
+            print('Elige una opción válida')
+            continue            
+    return opc
     
 contactos = obtener_contactos()
 listar_contactos()
@@ -101,5 +130,7 @@ while True:
     elif opcion == 2:
         listar_contactos()
     elif opcion == 3:
+        buscar_contacto()
+    else:
         break
     
