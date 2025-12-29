@@ -86,7 +86,7 @@ def buscar_contacto():
         print('La lista de contactos está vacia')
         return
     
-    abuscar = input('Ingresa el nombre, telefono o email a buscar: ').strip().lower()
+    abuscar = input('Ingresa el nombre, telefono o email: ').strip().lower()
     if not abuscar:
         print('Debe ingredar un término para buscar')
         return
@@ -101,8 +101,30 @@ def buscar_contacto():
     if resultados:
         print(f'Se encontraron {len(resultados)} resultado(s): ')
         mostrar_contactos(resultados)
+        return resultados
     else:
         print(f'No se encontraron resultados coincidentes con {abuscar}')        
+
+def eliminar_contacto():
+    aeliminar = buscar_contacto()
+    
+    if len(aeliminar) > 1:
+        try:
+            op = int(input((f'\nQué contacto quieres eliminar? (1-{len(aeliminar)}) ')))
+        except ValueError:
+            print('Debe ingresar un número entero')
+        if op <1 or op > len(aeliminar):
+            print('Opción no válida')
+            return
+    else:
+        op = 1
+    
+    print(f'aleminar: {aeliminar[0]}')
+    contactos_actualizados = [c for c in contactos if c != aeliminar[op-1]]
+    return contactos_actualizados
+    #print(f'Contacto {contacto_borrado['nombre']} borrado correctamente')
+        
+    
 
 def menu():
     while True:
@@ -110,17 +132,21 @@ def menu():
         print('1. Agregar contacto')
         print('2. Mostrar contactos')
         print('3. Buscar contacto')
-        print('4. Salir')
+        print('4. Eliminar contacto')
+        print('5. Salir')
         try:
             opc = int(input())
-            if opc in range(1,5):
+            if opc in range(1,6):
                 break
             print('Elige una opción válida')
         except ValueError:
             print('Elige una opción válida')
             continue            
     return opc
-    
+
+
+
+  
 contactos = obtener_contactos()
 listar_contactos()
 while True:
@@ -131,6 +157,9 @@ while True:
         listar_contactos()
     elif opcion == 3:
         buscar_contacto()
+    elif opcion == 4:
+        contactos = eliminar_contacto()
+        guardar_contactos()
     else:
         break
     
